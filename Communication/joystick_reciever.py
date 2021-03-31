@@ -1,38 +1,51 @@
 '''
 Paho Library Link: https://www.eclipse.org/paho/index.php?page=clients/python/docs/index.php
 '''
-import paho.mqtt.client as mqtt
-
+from paho.mqtt import client as mqtt
+r_x = 0.0
+r_y = 0.0
+accel_state = 0
+theta = 0.0
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
     # From Paho Website: Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     print("Connected with result code " + str(rc))
     print("----------")
-    client.subscribe("joystick/data")
+    subs = [("joystick/data/x",0), ("joystick/data/y",0),("joystick/data/accel",0),("joystick/data/theta",0)]
+    client.subscribe(subs)
 
 
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, message):
     message.payload = message.payload.decode("utf-8")
-    print("Payload: {}".format(str(message.payload)))
-    data = message.payload.split(',')
+    global r_x,r_y,accel_state,theta    
+    print("Collecting " + str(message.topic) + " ...")
+    if (message.topic == "joystick/data/x"):
+        r_x = float(message.payload)
+    elif (message.topic == "joystick/data/y"):
+        r_y = float(message.payload)
+    elif (message.topic == "joystick/data/accel"):
+        accel_state = int(message.payload)
+    elif (message.topic == "joystick/data/theta"):
+        theta = float(message.payload)
+        # Last message recieved so print everything
+        print_data()
+        print("----------")
 
-    r_x = float(data[0])
-    r_y = float(data[1])
-    accel_state = int(data[2])
-    theta = float(data[3])
 
-    print("X: {:.3f}\t Y: {:.3f}\t Accel: {}\t Theta: {:.3f}".format(r_x,r_y,accel_state,theta))
-
-    print("----------")
 
 # Callback for when there is a disconnect
 def on_disconnect(client, userdata, rc):
     #rc indicates the disconnection state. rc = 0 means that the callback was called in response to a disconnect() call
     if (rc != 0):
         print("Unexpected disconnection.")
+
+
+def print_data():
+    global r_x,r_y,accel_state,theta    
+    print("X: {:.3f}\t Y: {:.3f}\t Accel: {}\t Theta: {:.3f}".format(r_x,r_y,accel_state,theta))
 
 
 # Create a new client with defaults
