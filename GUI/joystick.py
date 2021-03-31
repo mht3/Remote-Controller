@@ -98,8 +98,9 @@ canvas_r.pack(side=LEFT)
 def publishMovement(r_x, r_y, accel_state, theta):
     print("X: {:.3f}\t Y: {:.3f}\t Accel: {}\t Theta: {:.3f}".format(r_x,r_y,accel_state,theta))
     print("Publishing controller data...")
-    publish.single("joystick/data", "{x},{y},{accel},{theta}".format(x=r_x,y=r_y,accel=accel_state,theta=theta),
-        hostname="test.mosquitto.org")
+    data = ({'topic':"joystick/data/x", 'payload':r_x}, {'topic':"joystick/data/y", 'payload':r_y},
+        {'topic':"joystick/data/accel", 'payload':accel_state}, {'topic':"joystick/data/theta", 'payload':theta})
+    publish.multiple(data, hostname="test.mosquitto.org")
     print("----------Done----------")
 
 def upAccel():
