@@ -102,7 +102,52 @@ def publishMovement(r_x, r_y, accel_state, theta):
         {'topic':"joystick/data/accel", 'payload':accel_state}, {'topic':"joystick/data/theta", 'payload':theta})
     publish.multiple(data, hostname="test.mosquitto.org")
     print("----------Done----------")
+    
+def getQuadrant(theta):
+    quadrant = 1
+    if ( theta >= 0 and theta <= np.pi/2 ):
+        quadrant = 1
+    elif ( theta <= np.pi):
+        quadrant = 2
+    elif ( theta <= 3*np.pi/2 ):
+        quadrant = 3
+    elif ( theta <= 2*np.pi):
+        quadrant = 4
+    return quadrant
 
+def updateDeltas(state, rd):
+    global theta
+    rd = abs(rd)
+    quadrant = getQuadrant(theta)
+    dx = 0
+    dy = 0
+    # New theta normalized depending on quadrant
+    alpha = theta
+    if ( quadrant == 2):
+        alpha = np.pi - theta
+    elif ( quadrant == 3 ):
+        alpha = theta - np.pi
+    elif ( quadrant == 4 ):
+        alpha = 2*np.pi - theta
+
+    if (state == "UP"):
+        if (quadrant == 1 or quadrant == 3):
+            dx = rd*np.cos(alpha)
+            dy = -rd*np.sin(alpha)
+        else:
+            # quadrant 2 or 4
+            dx = -rd*np.cos(alpha)
+            dy = -rd*np.sin(alpha)
+    else:
+        if (quadrant == 1 or quadrant == 3):
+            dx = -rd*np.cos(alpha)
+            dy = rd*np.sin(alpha)
+        else:
+            # quadrant 2 or 4
+            dx = rd*np.cos(alpha)
+            dy = rd*np.sin(alpha)
+
+    return (dx,dy)
 def upAccel():
     global accel_state
     if (accel_state < 3):
@@ -167,77 +212,83 @@ def checkThetaBounds(state):
 
 def onKeyUp():
     global accel_state, r_x, r_y, ring_1_radius, ring_2_radius, ring_3_radius, curr_ring, theta
-    dx = 0.0
-    dy = 0.0
-    
+
+    # the current radius differential
+    rd = 0
     if (accel_state == 0 or accel_state == -1):
         if (accel_state == 0):
             curr_ring = ring_1_radius
+            theta = np.pi/2
         else:
             curr_ring = 0
 
-        dy = -ring_1_radius
+        rd = -ring_1_radius
     elif (accel_state == 1 or accel_state == -2):
         if (accel_state == 1):
             curr_ring = ring_2_radius
         else:
             curr_ring = ring_1_radius
 
-        dy = -(ring_2_radius-ring_1_radius)
+        rd = -(ring_2_radius-ring_1_radius)
     elif (accel_state == 2 or accel_state == -3):
         if (accel_state == 2):
             curr_ring = ring_3_radius
         else:
             curr_ring = ring_2_radius
         
-        dy = -(ring_3_radius-ring_2_radius)
-    if (((r_y-dy)**2 + r_x**2) <= ring_3_radius**2):
+        rd = -(ring_3_radius-ring_2_radius)
+
+    dx,dy = updateDeltas("UP",rd)
+
+    if (((r_y-dy)**2 + (r_x+dx)**2) <= ring_3_radius**2):
         upAccel()
-        if (accel_state == 1): theta = np.pi/2
         if accel_state == 0:
             reset()
         else:
             r_y = r_y - dy
+            r_x = r_x + dx
             canvas.move(joystick,dx,dy)
             publishMovement(r_x, r_y, accel_state, theta)
 
 def onKeyDown():
     global accel_state, r_x, r_y, ring_1_radius, ring_2_radius, ring_3_radius, curr_ring, theta
-    dx = 0.0
-    dy = 0.0
-    
+
+    # the current radius differential
+    rd = 0
     if (accel_state == 0 or accel_state == 1):
         if (accel_state == 0):
             curr_ring = ring_1_radius
+            theta = 3*np.pi/2
         else:
             curr_ring = 0
 
-        dy = ring_1_radius
+        rd = ring_1_radius
     elif (accel_state == -1 or accel_state == 2):
         if (accel_state == -1):
             curr_ring = ring_2_radius
         else:
             curr_ring = ring_1_radius
 
-        dy = (ring_2_radius-ring_1_radius)
+        rd = (ring_2_radius-ring_1_radius)
     elif (accel_state == -2 or accel_state == 3):
         if (accel_state == -2):
             curr_ring = ring_3_radius
         else:
             curr_ring = ring_2_radius
 
-        dy = (ring_3_radius-ring_2_radius)
+        rd = (ring_3_radius-ring_2_radius)
 
-    if (((r_y-dy)**2 + r_x**2) <= ring_3_radius**2):
+    dx,dy = updateDeltas("DOWN",rd)
+
+    if (((r_y-dy)**2 + (r_x+dx)**2) <= ring_3_radius**2):
         downAccel()
-        if (accel_state == -1): theta = 3*np.pi/2
         if accel_state == 0:
             reset()
         else:
             r_y = r_y - dy
+            r_x = r_x + dx
             canvas.move(joystick,dx,dy)
             publishMovement(r_x, r_y, accel_state, theta)
-
 
 def onKeyLeft():
     global accel_state, r_x, r_y, ring_3_radius, curr_ring, theta, dtheta
@@ -279,7 +330,7 @@ def reset():
     global accel_state, r_x, r_y, theta
     accel_state = 0
     updateAccelGraphics()
-    theta = np.pi
+    theta = 0
     canvas.move(joystick, -r_x, r_y)
     r_x = 0
     r_y = 0
@@ -327,4 +378,3 @@ root.bind("<Down>", down)
 
 
 root.mainloop()
-
