@@ -1,4 +1,4 @@
-from tkinter import *
+import tkinter 
 import paho.mqtt.publish as publish
 import math
 import numpy as np
@@ -7,7 +7,7 @@ import numpy as np
 width = 500
 height = 500
 dimensions = "{}x{}".format(width,height)
-root = Tk()
+root = tkinter.Tk()
 root.geometry(dimensions)
 root.configure(bg='lightgrey')
 root.title("Remote Controller")
@@ -22,8 +22,8 @@ frame_height = height
 joystick_x = frame_width/2
 joystick_y = frame_height/2
 radius = 40
-frame_l = Frame(root)
-frame_l.pack(side=LEFT)
+frame_l = tkinter.Frame(root)
+frame_l.pack(side=tkinter.LEFT)
 
 # joystick tracking to send over mqtt line
 # this is the r vector starting at the origin of joystick_x and joystick_y
@@ -33,7 +33,7 @@ theta = np.pi/2
 dtheta = (2*np.pi)/80
 
 #joystick canvas
-canvas = Canvas(frame_l, height=frame_height, width =frame_width, bg='lightgray')
+canvas = tkinter.Canvas(frame_l, height=frame_height, width =frame_width, bg='lightgray')
 canvas.grid(row=0,column=0)
 ring_factor = 1.5
 ring_1_radius = ring_factor*radius
@@ -53,7 +53,7 @@ canvas_r_height = frame_height
 # initial 0 acceleration
 rect_width = 60
 rect_height = rect_width/3
-canvas_r = Canvas(root, height=canvas_r_height, width = canvas_r_width, bg='lightgrey')
+canvas_r = tkinter.Canvas(root, height=canvas_r_height, width = canvas_r_width, bg='lightgrey')
 zero_accel = canvas_r.create_rectangle(canvas_r_width/2 - rect_width/2,
     canvas_r_height/2 - rect_height/2, canvas_r_width/2 + rect_width/2,canvas_r_height/2 +rect_height/2, fill='grey', outline="")
 
@@ -92,16 +92,16 @@ level_down_2 = canvas_r.create_rectangle(canvas_r_width/2 - up_2_width/2,
 level_down_3 = canvas_r.create_rectangle(canvas_r_width/2 - up_3_width/2,
     canvas_r_height/2 - up_3_height/2 +  3*(shift + 0.8*0.8*space), canvas_r_width/2 + up_3_width/2,
     canvas_r_height/2 + up_3_height/2 + 3*(shift + 0.8*0.8*space), fill='darkred', outline="")
-canvas_r.pack(side=LEFT)
+canvas_r.pack(side=tkinter.LEFT)
 
 # Publish to through MQTT network!
 def publishMovement(r_x, r_y, accel_state, theta):
     print("X: {:.3f}\t Y: {:.3f}\t Accel: {}\t Theta: {:.3f}".format(r_x,r_y,accel_state,theta))
-    print("Publishing controller data...")
-    data = ({'topic':"joystick/data/x", 'payload':r_x}, {'topic':"joystick/data/y", 'payload':r_y},
-        {'topic':"joystick/data/accel", 'payload':accel_state}, {'topic':"joystick/data/theta", 'payload':theta})
-    publish.multiple(data, hostname="test.mosquitto.org")
-    print("----------Done----------")
+    # print("Publishing controller data...")
+    # data = ({'topic':"joystick/data/x", 'payload':r_x}, {'topic':"joystick/data/y", 'payload':r_y},
+    #     {'topic':"joystick/data/accel", 'payload':accel_state}, {'topic':"joystick/data/theta", 'payload':theta})
+    # publish.multiple(data, hostname="test.mosquitto.org")
+    # print("----------Done----------")
     
 def getQuadrant(theta):
     quadrant = 1
@@ -204,8 +204,8 @@ def checkThetaBounds(state):
     isUp = accel_state > 0
     isDown = accel_state < 0
     #Upper and lower bounds have range of 120 degrees (60 degrees on each size of x = 0 line)
-    thetaUpBounds = (theta_temp > (np.pi/6)) and (theta_temp < (5*np.pi/6))
-    thetaDownBounds = (theta_temp > (7*np.pi/6)) and (theta_temp < (11*np.pi/6))
+    thetaUpBounds = (theta_temp > (np.pi/12)) and (theta_temp < (11*np.pi/12))
+    thetaDownBounds = (theta_temp > (13*np.pi/12)) and (theta_temp < (23*np.pi/12))
     upBound = isUp and thetaUpBounds
     downBound = isDown and thetaDownBounds
     return (upBound or downBound)
