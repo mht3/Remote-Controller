@@ -100,7 +100,11 @@ def publishMovement(r_x, r_y, accel_state, theta):
     print("Publishing controller data...")
     data = ({'topic':"joystick/data/x", 'payload':r_x}, {'topic':"joystick/data/y", 'payload':r_y},
         {'topic':"joystick/data/accel", 'payload':accel_state}, {'topic':"joystick/data/theta", 'payload':theta})
-    publish.multiple(data, hostname="192.168.1.130")
+
+    # TODO Make command line interface to ask for username and password
+    auth = {'username':"admin", 'password':"admin"}
+
+    publish.multiple(data, hostname="192.168.1.130", auth=auth)
     print("----------Done----------")
     
 def getQuadrant(theta):

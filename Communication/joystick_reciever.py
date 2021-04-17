@@ -12,6 +12,7 @@ def on_connect(client, userdata, flags, rc):
     # reconnect then subscriptions will be renewed.
     print("Connected with result code " + str(rc))
     print("----------")
+    # TODO Make command line interface to ask for username and password
     subs = [("joystick/data/x",0), ("joystick/data/y",0),("joystick/data/accel",0),("joystick/data/theta",0)]
     client.subscribe(subs)
 
@@ -62,6 +63,9 @@ client.on_message =  on_message
 client.on_disconnect = on_disconnect
 
 # Connects to the mosquitto broker with default port and keepalive configurations
+
+# TODO Read a username password file and add correct users.
+client.username_pw_set(username="admin",password="admin")
 client.connect(host="192.168.1.130", port=1883, keepalive=60)
 
 # loop forever (handles reconnecting)
