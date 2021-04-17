@@ -62,7 +62,7 @@ client.on_message =  on_message
 client.on_disconnect = on_disconnect
 
 # Connects to the mosquitto broker with default port and keepalive configurations
-client.connect(host="test.mosquitto.org", port=1883, keepalive=60)
+client.connect(host="192.168.1.130", port=1883, keepalive=60)
 
 # loop forever (handles reconnecting)
 client.loop_forever()

@@ -97,11 +97,11 @@ canvas_r.pack(side=tkinter.LEFT)
 # Publish to through MQTT network!
 def publishMovement(r_x, r_y, accel_state, theta):
     print("X: {:.3f}\t Y: {:.3f}\t Accel: {}\t Theta: {:.3f}".format(r_x,r_y,accel_state,theta))
-    # print("Publishing controller data...")
-    # data = ({'topic':"joystick/data/x", 'payload':r_x}, {'topic':"joystick/data/y", 'payload':r_y},
-    #     {'topic':"joystick/data/accel", 'payload':accel_state}, {'topic':"joystick/data/theta", 'payload':theta})
-    # publish.multiple(data, hostname="test.mosquitto.org")
-    # print("----------Done----------")
+    print("Publishing controller data...")
+    data = ({'topic':"joystick/data/x", 'payload':r_x}, {'topic':"joystick/data/y", 'payload':r_y},
+        {'topic':"joystick/data/accel", 'payload':accel_state}, {'topic':"joystick/data/theta", 'payload':theta})
+    publish.multiple(data, hostname="192.168.1.130")
+    print("----------Done----------")
     
 def getQuadrant(theta):
     quadrant = 1
