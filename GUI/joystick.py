@@ -2,8 +2,54 @@ import tkinter
 import paho.mqtt.publish as publish
 import math
 import numpy as np
+import csv
+from getpass import getpass
+
+# sudo apt-get install python-passlib
+from passlib.hash import sha256_crypt
+debug = False
+# Initial Username and Password Requirements
+def check_user(usernamePath="users.txt", passwordPath="passwords.txt"):
+    username = input("Username: ")
+    password = getpass("Password: ")
+    idx = findUsername(usernamePath, username)
+    found_password = False
+    if (idx >= 0):
+        found_password = findPassword(passwordPath, password, idx)
+    if idx >= 0 and found_password:
+        print("Welcome, {}!".format(username))
+        print("----------")
+    else:
+        print("Invalid Username or Password. Try again. \n")
+        check_user()
+    return username,password
+
+def findUsername(fileName, username):
+    found_username = False
+    idx = -1
+    with open(fileName,"r") as user_file:
+        line = user_file.readline()
+        line = line.replace(" ","")
+        usernames = line.split(',')
+        for i in range(len(usernames)):
+            if (username == usernames[i]):
+                idx = i
+                break
+    user_file.close()
+    return idx
+
+def findPassword(fileName, password, idx):
+    found_password = False
+    with open(fileName,"r") as password_file:
+        line = password_file.readline()
+        line = line.replace(" ","")
+        passwords = line.split(',')
+        found_password = sha256_crypt.verify(password, passwords[idx])
+    password_file.close()
+    return found_password
 
 # Initial setup
+username, password = check_user()
 width = 500
 height = 500
 dimensions = "{}x{}".format(width,height)
@@ -96,16 +142,19 @@ canvas_r.pack(side=tkinter.LEFT)
 
 # Publish to through MQTT network!
 def publishMovement(r_x, r_y, accel_state, theta):
-    print("X: {:.3f}\t Y: {:.3f}\t Accel: {}\t Theta: {:.3f}".format(r_x,r_y,accel_state,theta))
-    print("Publishing controller data...")
+    global username, password, debug
+    if debug:
+        print("X: {:.3f}\t Y: {:.3f}\t Accel: {}\t Theta: {:.3f}".format(r_x,r_y,accel_state,theta))
+        print("Publishing controller data...")
     data = ({'topic':"joystick/data/x", 'payload':r_x}, {'topic':"joystick/data/y", 'payload':r_y},
-        {'topic':"joystick/data/accel", 'payload':accel_state}, {'topic':"joystick/data/theta", 'payload':theta})
+        {'topic':"joystick/data/accel", 'payload':accel_state})
 
     # TODO Make command line interface to ask for username and password
-    auth = {'username':"admin", 'password':"admin"}
+    auth = {'username':username, 'password':password}
 
     publish.multiple(data, hostname="192.168.1.130", auth=auth)
-    print("----------Done----------")
+    if debug:
+        print("----------Done----------")
     
 def getQuadrant(theta):
     quadrant = 1
