@@ -1,6 +1,6 @@
 # Remote-Controller
 
-Telecommunications research project using the MQTT protocol. The goal of this project was to create a method to control a vehicle wirelessly. The MQTT protocol is a clean, fast solution to this problem. While this code does not control an actual vehicle, it simulates the vehicle with a graphics that copy how the joystick itself moves. 2 Raspberry pi's are used in this implemention. One is for the ground station and one will be used for onboard the vehicle. The ground station pi acts as a publisher and the central broker for the data. 
+Telecommunications research project using the MQTT protocol. The goal of this project was to create a method to control a vehicle wirelessly. The MQTT protocol is a clean, fast solution to this problem. While this code does not control an actual vehicle, it simulates the vehicle with a GUI that copies how the joystick itself moves. 2 Raspberry pi's are used in this implemention. One is for the ground station remote controller and one will be used for onboard the vehicle. The ground station pi acts as a publisher and the central broker for the data. 
 
 This folder includes:
 
