@@ -13,6 +13,7 @@ accel_state = 0
 new_r_x = 0.0
 new_r_y = 0.0  
 new_accel_state = 0
+
 # ----- VEHICLE GRAPHICS SETUP -----
 width = 500
 height = 500
@@ -22,8 +23,7 @@ root.geometry(dimensions)
 root.configure(bg='lightgrey')
 root.title("Vehicle")
 
-turn_speed = 10
-# joystick frame
+# joystick frame setup. Same as in joystick.py
 frame_width = width/1.5
 frame_height = height
 joystick_x = frame_width/2
@@ -32,36 +32,36 @@ radius = 40
 frame_l = tkinter.Frame(root)
 frame_l.pack(side=tkinter.LEFT)
 
-#joystick canvas
+# Tkinter joystick canvas setup
 canvas = tkinter.Canvas(frame_l, height=frame_height, width =frame_width, bg='lightgray')
 canvas.grid(row=0,column=0)
 ring_factor = 1.5
 ring_1_radius = ring_factor*radius
 ring_2_radius = ring_factor*ring_1_radius
 ring_3_radius = ring_factor*ring_2_radius
-curr_ring = 0
 
+# Creates the three rings and initializes the joystick to its center position
 joystick_a1 = canvas.create_oval(joystick_x - ring_1_radius, joystick_y - ring_1_radius, joystick_x + ring_1_radius, joystick_y + ring_1_radius)
 joystick_a2 = canvas.create_oval(joystick_x - ring_2_radius, joystick_y - ring_2_radius, joystick_x + ring_2_radius, joystick_y + ring_2_radius)
 joystick_a3 = canvas.create_oval(joystick_x - ring_3_radius, joystick_y - ring_3_radius, joystick_x + ring_3_radius, joystick_y + ring_3_radius)
 joystick = canvas.create_oval(joystick_x - radius, joystick_y - radius, joystick_x + radius, joystick_y + radius, fill="black")
 
-# acceleration graphics
+# acceleration canvis graphics setup
+# this takes up the right half of the GUI
 canvas_r_width = width-frame_width
 canvas_r_height = frame_height
 
-# initial 0 acceleration
+# initializing 0 acceleration level graphic (The grey rectangle in the middle of the right hand side of the GUI)
 rect_width = 60
 rect_height = rect_width/3
 canvas_r = tkinter.Canvas(root, height=canvas_r_height, width = canvas_r_width, bg='lightgrey')
 zero_accel = canvas_r.create_rectangle(canvas_r_width/2 - rect_width/2,
     canvas_r_height/2 - rect_height/2, canvas_r_width/2 + rect_width/2,canvas_r_height/2 +rect_height/2, fill='grey', outline="")
 
-# Upper acceleration levels
-
+# Upper acceleration level graphics
+# Initializes the 3 rectangles above the 0 level acceleration. Colors them dark green indicating acceleration
 shift = rect_height
 space = 10
-
 up_1_width = rect_width*0.8
 up_1_height = rect_height*0.8
 level_up_1 = canvas_r.create_rectangle(canvas_r_width/2 - up_1_width/2,
@@ -80,7 +80,8 @@ level_up_3 = canvas_r.create_rectangle(canvas_r_width/2 - up_3_width/2,
     canvas_r_height/2 - up_3_height/2 -  3*(shift + 0.8*0.8*space), canvas_r_width/2 + up_3_width/2,
     canvas_r_height/2 + up_3_height/2 - 3*(shift + 0.8*0.8*space), fill='darkgreen', outline="")
 
-# Lower acceleration levels
+# Lower acceleration level graphics
+# Initializes the 3 rectangles below the 0 level acceleration. Colors them dark red indicating deceleration
 level_down_1 = canvas_r.create_rectangle(canvas_r_width/2 - up_1_width/2,
     canvas_r_height/2 - up_1_height/2 + shift + space, canvas_r_width/2 + up_1_width/2,
     canvas_r_height/2 + up_1_height/2 + shift + space, fill='darkred', outline="")
@@ -94,7 +95,12 @@ level_down_3 = canvas_r.create_rectangle(canvas_r_width/2 - up_3_width/2,
     canvas_r_height/2 + up_3_height/2 + 3*(shift + 0.8*0.8*space), fill='darkred', outline="")
 canvas_r.pack(side=tkinter.LEFT)
 
+
 def updateAccelGraphics():
+    '''
+    Updates the acceleration graphics by coloring the upper acceleration levels light green
+    and lower acceleration levels light red.
+    '''
     global accel_state
     global canvas_r
     if (accel_state == 3): 
@@ -127,7 +133,7 @@ def on_connect(client, userdata, flags, rc):
     # reconnect then subscriptions will be renewed.
     print("Connected with result code " + str(rc))
     print("----------")
-    # TODO Make command line interface to ask for username and password
+    # data we are subscribing to with its respective QoS level. (Quality of Service levels are 0 for enhanced speed)
     subs = [("joystick/data/x",0), ("joystick/data/y",0),("joystick/data/accel",0)]
     client.subscribe(subs)
 
@@ -169,10 +175,17 @@ def on_disconnect(client, userdata, rc):
 
 
 def print_data():
+    '''
+    Debugger method for printing data recieved
+    '''
     global r_x,r_y,accel_state   
     print("X: {:.3f}\t Y: {:.3f}\t Accel: {}".format(r_x,r_y,accel_state))
 
 def findUsernames(fileName):
+    '''
+    Finds all of the usernames in the text file
+    Currently unused in the program.
+    '''
     usernames = []
     with open(fileName,"r") as user_file:
         line = user_file.readline()
@@ -182,6 +195,10 @@ def findUsernames(fileName):
     return usernames
 
 def findPasswords(fileName):
+    '''
+    Finds all of the passwords in the text file.
+    Currently unused in the program.
+    '''
     passwords = []
     with open(fileName,"r") as password_file:
         line = password_file.readline()
@@ -215,9 +232,10 @@ client.on_message =  on_message
 # Tells client what to do on disconnect
 client.on_disconnect = on_disconnect
 
-# Connects to the mosquitto broker with default port and keepalive configurations
-
+# Unlocks the account so data can be recieved.
 add_user()
+
+# Connects to the local mosquitto broker with default port and keepalive configurations
 client.connect(host="192.168.1.130", port=1883, keepalive=60)
 
 # need loop_start() and not loop_forever() in order to have the GUI run in a loop
