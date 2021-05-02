@@ -8,7 +8,7 @@ This folder includes:
 
 - Reciever (vehicle) code that takes in the data sent by th joystick GUI and mimics th output
 
-- encryption techniques to make sure only verified users can control the joystick.
+- Encryption techniques to make sure only verified users can control the joystick.
 
 For more information on how to use this code, see instructions.md
 
