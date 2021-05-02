@@ -10,6 +10,8 @@ This folder includes:
 
 - Encryption techniques to make sure only verified users can control the joystick.
 
-For more information on how to use this code, see instructions.md
+For more information on how to use this code, see **instructions.md**
+
+---
 
 Created by Matt Taylor at the University of Illinois Spring 2021
