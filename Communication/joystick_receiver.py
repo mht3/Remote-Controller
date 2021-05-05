@@ -236,7 +236,7 @@ client.on_disconnect = on_disconnect
 add_user()
 
 # Connects to the local mosquitto broker with default port and keepalive configurations
-client.connect(host="192.168.1.130", port=1883, keepalive=60)
+client.connect(host="192.168.1.28", port=1883, keepalive=60)
 
 # need loop_start() and not loop_forever() in order to have the GUI run in a loop
 client.loop_start()

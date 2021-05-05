@@ -208,7 +208,7 @@ def publishMovement(r_x, r_y, accel_state, theta):
     auth = {'username':username, 'password':password}
 
     # Published to the local Mosquitto broker. In this case it is my raspberry pi 4.
-    publish.multiple(data, hostname="192.168.1.130", auth=auth)
+    publish.multiple(data, hostname="192.168.1.28", auth=auth)
     if debug:
         print("----------Done----------")
     
