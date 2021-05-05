@@ -105,4 +105,33 @@ As you can see in users.txt and passwords.txt, I already have admin entered in. 
 $ python3 hash_passwords.py
 ```
 
-This will teke the password you enter, automatically encrypt it using SHA-256 hashing, and automatically insert it into the passwords.txt file. Great!
+This will take the password you enter, automatically encrypt it using SHA-256 hashing, and automatically insert it into the passwords.txt file. Great we're almost done.
+
+## Running the code
+
+First of all, make sure the IP address in the code is up to date with your device. This must be updated in joystick.py and joystick_receiver.py. Another important note is that the receiver code assumes the authentication uses 'admin' and 'admin' for the username and password. Change this for your own needs.
+
+### Run the vehicle GUI
+
+Assuming you are in the `Remote-Controller` directory, type the following on your raspberry pi that is receiving the data.
+
+```
+python3 Communication/joystick_receiver.py
+```
+
+A tkinter window should pop up named 'Vehicle'. It cannot take any keyboard inputs and only can receive what the publisher sends. 
+
+### Run the joystick GUI
+
+On your other raspberry py, type the following:
+
+```
+python3 GUI/joystick.py
+```
+
+You will be prompted to enter your username and password, and once this is done the joystick GUI will pop up on a separate tkinter window. This GUI takes keyboard inputs of 'W' 'A' 'S' 'D' and also uses the up, down, left, and right arrow keys to move the joystick. On the right hand side of the screen you should see the acceleration levels move as well. You should see the vehicle GUI start mimic exactly what the joystick is doing.
+
+Tutorial Complete :) Thanks for reading.
+
+- Matt
+
