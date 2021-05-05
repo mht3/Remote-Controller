@@ -30,8 +30,6 @@ sudo apt-get install python3-numpy
 sudo apt-get install python3-pip
 
 sudo pip3 install paho-mqtt
-sudo pip3 install numpy
-
 ```
 
 
