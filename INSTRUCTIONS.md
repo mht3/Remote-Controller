@@ -116,17 +116,17 @@ First of all, make sure the IP address in the code is up to date with your devic
 Assuming you are in the `Remote-Controller` directory, type the following on your raspberry pi that is receiving the data.
 
 ```
-python3 Communication/joystick_receiver.py
+$ python3 Communication/joystick_receiver.py
 ```
 
 A tkinter window should pop up named 'Vehicle'. It cannot take any keyboard inputs and only can receive what the publisher sends. 
 
 ### Run the joystick GUI
 
-On your other raspberry py, type the following:
+On your other raspberry py, type the following in terminal:
 
 ```
-python3 GUI/joystick.py
+$ python3 GUI/joystick.py
 ```
 
 You will be prompted to enter your username and password, and once this is done the joystick GUI will pop up on a separate tkinter window. This GUI takes keyboard inputs of 'W' 'A' 'S' 'D' and also uses the up, down, left, and right arrow keys to move the joystick. On the right hand side of the screen you should see the acceleration levels move as well. You should see the vehicle GUI start mimic exactly what the joystick is doing.
