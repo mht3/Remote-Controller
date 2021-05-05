@@ -87,7 +87,7 @@ allow_anonymous false
 
 password_file /etc/mosquitto/passwordfile
 ```
-Congrats! You've set up a local Mosquitto broker.
+Congrats! You've set up a local Mosquitto broker. Big shoutout to bitluni for the help on this. You can watch his video here: https://www.youtube.com/watch?v=OOqS8fhd6ck&t=262s
 
 ## Adding authentication to the publisher and subscriber code
 
