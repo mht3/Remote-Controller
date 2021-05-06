@@ -10,6 +10,9 @@ This folder includes:
 
 - Encryption techniques to make sure only verified users can control the joystick.
 
+![image](https://user-images.githubusercontent.com/60635839/117226051-65a8c580-add9-11eb-8431-0fa3608ba539.png)
+
+
 For more information, including how to run the code and set up a local broker, see **INSTRUCTIONS.md**
 
 ---
